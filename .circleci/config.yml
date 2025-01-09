@@ -26,7 +26,7 @@ jobs:
       - run: |
           echo "Running tests"
           npm run test
-          
+
   deploy:
     docker:
       - image: cimg/node:16.10
@@ -55,9 +55,9 @@ jobs:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
       - docker/build:
-          image: education-space/flask-docker-app:latest
+          image: vincentnwa/container-assignment:latest
       - docker/push:
-          image: education-space/flask-docker-app:latest
+          image: vincentnwa/container-assignment:latest
 
 workflows:
   simple_workflow:
