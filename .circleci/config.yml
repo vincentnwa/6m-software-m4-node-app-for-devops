@@ -33,6 +33,9 @@ jobs:
       - setup_remote_docker
       - heroku/install
       - checkout
+      - docker/login:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
       - run:
           name: Heroku Container Push
           command: |
@@ -41,7 +44,19 @@ jobs:
             heroku container:push web -a fathomless-hamlet-28308
             heroku container:release web -a fathomless-hamlet-28308
 
-
+  build-and-push:
+    docker:
+      - image: cimg/node:16.10
+    steps:
+      - setup_remote_docker
+      - checkout
+      - docker/login:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
+      - docker/build:
+          image: education-space/flask-docker-app:latest
+      - docker/push:
+          image: education-space/flask-docker-app:latest
 
 workflows:
   simple_workflow:
@@ -51,5 +66,8 @@ workflows:
           requires: 
             - build
       - deploy:
+          requires:
+            - test
+      - build-and-push:
           requires:
             - test
