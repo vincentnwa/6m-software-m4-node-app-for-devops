@@ -2,6 +2,8 @@ version: 2.1
 
 orbs:
   node: circleci/node@5.0.1
+  heroku: circleci/heroku@2.0.0
+  docker: circleci/docker@2.1.4
 
 jobs:
   build:
@@ -24,6 +26,21 @@ jobs:
       - run: |
           echo "Running tests"
           npm run test
+  deploy:
+    docker:
+      - image: cimg/node:16.10
+    steps:
+      - setup_remote_docker
+      - heroku/install
+      - checkout
+      - run:
+          name: Heroku Container Push
+          command: |
+            heroku container:login
+            heroku stack:set container -a fathomless-hamlet-28308
+            heroku container:push web -a fathomless-hamlet-28308
+            heroku container:release web -a fathomless-hamlet-28308
+
 
 
 workflows:
@@ -31,5 +48,8 @@ workflows:
     jobs:
       - build
       - test:
-          requires:
+          requires: 
             - build
+      - deploy:
+          requires:
+            - test
