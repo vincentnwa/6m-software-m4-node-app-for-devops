@@ -52,24 +52,39 @@ jobs:
       - run:
           name: Docker Login
           command: |
-            docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+            docker login -u "$DOCKERHUB_USERNAME" -p "$DOCKERHUB_PASSWORD"
       - run:
           name: Build Docker Image
-          command: docker build -t vincentnwa/container-assignment:latest .
+          command: docker build -t vincentnwa/container-assignment:${CIRCLE_TAG:-latest} .
       - run:
           name: Push Docker Image
-          command: docker push vincentnwa/container-assignment:latest
+          command: docker push vincentnwa/container-assignment:${CIRCLE_TAG:-latest}
 
 workflows:
   simple_workflow:
     jobs:
-      - build
+      - build:
+          filters:
+            branches: 
+              only: main
       - test:
           requires: 
             - build
+          filters:
+              branches:
+                only: main
       - deploy:
           requires:
-            - test
+            - test 
+          filters:
+            branches:
+              only: release
+            tags: only: /^v.*/
       - build-and-push:
           requires:
             - test
+          filters:
+            branches:
+              only: release
+            tags:
+              only: /^v.*/
