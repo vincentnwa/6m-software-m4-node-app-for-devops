@@ -79,7 +79,8 @@ workflows:
           filters:
             branches:
               only: release
-            tags: only: /^v.*/
+            tags:
+              only: /^v.*/
       - build-and-push:
           requires:
             - test
