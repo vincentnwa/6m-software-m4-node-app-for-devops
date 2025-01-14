@@ -57,7 +57,7 @@ jobs:
     docker: 
       - image: cimg/node:16.10
     environment:
-      IMAGE_NAME: jonnywony/education-space
+      IMAGE_NAME: vincentnwa/container-assignment
     steps:
       - checkout
       - setup_remote_docker
