@@ -87,7 +87,7 @@ workflows:
           filters:
             branches:
               only: main
-      - scan
+      - scan:
           requires:
             - test
           filters:
