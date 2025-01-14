@@ -44,10 +44,10 @@ jobs:
             heroku container:release web -a fathomless-hamlet-28308
     
     scan:
-    docker: 
-      - image: cimg/node:16.10
-    environment:
-      IMAGE_NAME: jonnywony/education-space
+      docker: 
+        - image: cimg/node:16.10
+      environment:
+        IMAGE_NAME: jonnywony/education-space
     steps:
       - checkout
       - setup_remote_docker
