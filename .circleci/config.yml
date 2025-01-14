@@ -42,23 +42,6 @@ jobs:
             heroku container:push web -a fathomless-hamlet-28308
             heroku container:release web -a fathomless-hamlet-28308
   
-    build-and-push:
-    docker:
-      - image: cimg/node:16.10
-    steps:
-      - setup_remote_docker
-      - checkout
-      - run:
-          name: Docker Login
-          command: |
-            docker login -u "$DOCKERHUB_USERNAME" -p "$DOCKERHUB_PASSWORD"
-      - run:
-          name: Build Docker Image
-          command: docker build -t vincentnwa/container-assignment:${CIRCLE_TAG:-latest} .
-      - run:
-          name: Push Docker Image
-          command: docker push vincentnwa/container-assignment:${CIRCLE_TAG:-latest}
-  
   scan:
     docker: 
       - image: cimg/node:16.10
@@ -95,6 +78,9 @@ workflows:
       #     requires:
       #       - test
       - scan:
+          requires:
+            - build
+      - codescan:
           requires:
             - build
       - test:
