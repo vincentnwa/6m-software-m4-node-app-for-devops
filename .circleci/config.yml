@@ -16,8 +16,9 @@ jobs:
       - run: |
           echo "Install dependencies"
           npm install
+
   test:
-    docker: 
+    docker:
       - image: cimg/node:16.10
     steps:
       - checkout
@@ -26,7 +27,6 @@ jobs:
       - run: |
           echo "Running tests"
           npm run test
-
 
   deploy:
     docker:
@@ -42,7 +42,6 @@ jobs:
             heroku stack:set container -a fathomless-hamlet-28308
             heroku container:push web -a fathomless-hamlet-28308
             heroku container:release web -a fathomless-hamlet-28308
-
 
   build-and-push:
     docker:
@@ -60,18 +59,18 @@ jobs:
       - run:
           name: Push Docker Image
           command: docker push vincentnwa/container-assignment:${CIRCLE_TAG:-latest}
-    
-    scan:
-      docker: 
-        - image: cimg/node:16.10
-      environment:
-        IMAGE_NAME: jonnywony/education-space
+
+  scan:
+    docker:
+      - image: cimg/node:16.10
+    environment:
+      IMAGE_NAME: vincentnwa/container-assignment
     steps:
       - checkout
       - setup_remote_docker
       - docker/check
       - run: docker build -t $IMAGE_NAME .
-      - snyk/scan: 
+      - snyk/scan:
           docker-image-name: $IMAGE_NAME
 
 workflows:
@@ -79,18 +78,23 @@ workflows:
     jobs:
       - build:
           filters:
-            branches: 
+            branches:
               only: main
       - test:
           requires:
-            - scan
             - build
           filters:
-              branches:
-                only: main
+            branches:
+              only: main
+      - scan:
+          requires:
+            - test
+          filters:
+            branches:
+              only: main
       - deploy:
           requires:
-            - test 
+            - test
           filters:
             branches:
               only: release
