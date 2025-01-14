@@ -42,19 +42,7 @@ jobs:
             heroku stack:set container -a fathomless-hamlet-28308
             heroku container:push web -a fathomless-hamlet-28308
             heroku container:release web -a fathomless-hamlet-28308
-    
-    scan:
-      docker: 
-        - image: cimg/node:16.10
-      environment:
-        IMAGE_NAME: jonnywony/education-space
-    steps:
-      - checkout
-      - setup_remote_docker
-      - docker/check
-      - run: docker build -t $IMAGE_NAME .
-      - snyk/scan: 
-          docker-image-name: $IMAGE_NAME
+
 
   build-and-push:
     docker:
@@ -72,6 +60,19 @@ jobs:
       - run:
           name: Push Docker Image
           command: docker push vincentnwa/container-assignment:${CIRCLE_TAG:-latest}
+    
+    scan:
+      docker: 
+        - image: cimg/node:16.10
+      environment:
+        IMAGE_NAME: jonnywony/education-space
+    steps:
+      - checkout
+      - setup_remote_docker
+      - docker/check
+      - run: docker build -t $IMAGE_NAME .
+      - snyk/scan: 
+          docker-image-name: $IMAGE_NAME
 
 workflows:
   simple_workflow:
