@@ -17,9 +17,8 @@ jobs:
       - run: |
           echo "Install dependencies"
           npm install
-
   test:
-    docker:
+    docker: 
       - image: cimg/node:16.10
     steps:
       - checkout
@@ -28,7 +27,6 @@ jobs:
       - run: |
           echo "Running tests"
           npm run test
-
   deploy:
     docker:
       - image: cimg/node:16.10
@@ -43,26 +41,8 @@ jobs:
             heroku stack:set container -a fathomless-hamlet-28308
             heroku container:push web -a fathomless-hamlet-28308
             heroku container:release web -a fathomless-hamlet-28308
-
-  build-and-push:
-    docker:
-      - image: cimg/node:16.10
-    steps:
-      - setup_remote_docker
-      - checkout
-      - run:
-          name: Docker Login
-          command: |
-            docker login -u "$DOCKERHUB_USERNAME" -p "$DOCKERHUB_PASSWORD"
-      - run:
-          name: Build Docker Image
-          command: docker build -t vincentnwa/container-assignment:${CIRCLE_TAG:-latest} .
-      - run:
-          name: Push Docker Image
-          command: docker push vincentnwa/container-assignment:${CIRCLE_TAG:-latest}
-
   scan:
-    docker:
+    docker: 
       - image: cimg/node:16.10
     environment:
       IMAGE_NAME: vincentnwa/container-assignment
@@ -71,44 +51,34 @@ jobs:
       - setup_remote_docker
       - docker/check
       - run: docker build -t $IMAGE_NAME .
-      - snyk/scan:
+      - snyk/scan: 
           docker-image-name: $IMAGE_NAME
-
+  codescan:
+    docker: 
+      - image: cimg/node:16.10
+    environment:
+      IMAGE_NAME: jonnywony/education-space
+    steps:
+      - checkout
+      - setup_remote_docker
+      - docker/check
+      - snyk/install
+      - run: |
+          snyk code test
+  
 
 
 
 workflows:
   simple_workflow:
     jobs:
-      - build:
-          filters:
-            branches:
-              only: main
-      - test:
-          requires:
-            - build
-          filters:
-            branches:
-              only: main
+      - build
+      # - deploy:
+      #     requires:
+      #       - test
       - scan:
           requires:
-            - test
-          filters:
-            branches:
-              only: main
-      - deploy:
-          requires:
-            - test
-          filters:
-            branches:
-              only: release
-            tags:
-              only: /^v.*/
-      - build-and-push:
-          requires:
-            - test
-          filters:
-            branches:
-              only: release
-            tags:
-              only: /^v.*/
+            - build
+      - test:
+          requires: 
+            - scan
