@@ -74,6 +74,9 @@ jobs:
       - snyk/scan:
           docker-image-name: $IMAGE_NAME
 
+
+
+
 workflows:
   simple_workflow:
     jobs:
@@ -107,5 +110,5 @@ workflows:
           filters:
             branches:
               only: release
-            tags: 
+            tags:
               only: /^v.*/
